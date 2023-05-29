@@ -20,6 +20,7 @@ import android.net.Uri;
 import android.os.Bundle;
 // import android.support.v7.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.text.Editable;
 import android.view.View;
 import android.widget.CheckBox;
@@ -27,6 +28,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * This app displays an order form to order coffee.
@@ -69,34 +71,39 @@ public class MainActivity extends AppCompatActivity {
     public void submitOrder(View view) {
         // Get user's name
         EditText nameField = (EditText) findViewById(R.id.name_field);
+//        System.out.println("NAME: "+nameField);
         Editable nameEditable = nameField.getText();
         String name = nameEditable.toString();
+//        System.out.println("JUST STRING: "+"oops");
+//        System.out.println("NAME 2:"+name);
 
         // Figure out if the user wants whipped cream topping
         CheckBox whippedCreamCheckBox = (CheckBox) findViewById(R.id.whipped_cream_checkbox);
         boolean hasWhippedCream = whippedCreamCheckBox.isChecked();
+//        System.out.println("Whipped cream: "+hasWhippedCream);
 
         // Figure out if the user wants choclate topping
         CheckBox chocolateCheckBox = (CheckBox) findViewById(R.id.chocolate_checkbox);
         boolean hasChocolate = chocolateCheckBox.isChecked();
+//        System.out.println("CHocolate: "+hasChocolate);
 
         // Calculate the price
         int price = calculatePrice(hasWhippedCream, hasChocolate);
+//        System.out.println("PRICE: "+price);
 
         // Display the order summary on the screen
         String message = createOrderSummary(name, price, hasWhippedCream, hasChocolate);
+        System.out.println(createOrderSummary(name, price, hasWhippedCream, hasChocolate));
 
         // Use an intent to launch an email app.
         // Send the order summary in the email body.
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("mailto:")); // only email apps should handle this
         intent.putExtra(Intent.EXTRA_SUBJECT,
                 getString(R.string.order_summary_email_subject, name));
         intent.putExtra(Intent.EXTRA_TEXT, message);
+        startActivity(intent);
 
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        }
     }
 
     /**
@@ -140,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         priceMessage += "\n" + getString(R.string.order_summary_chocolate, addChocolate);
         priceMessage += "\n" + getString(R.string.order_summary_quantity, quantity);
         priceMessage += "\n" + getString(R.string.order_summary_price,
-                NumberFormat.getCurrencyInstance().format(price));
+                NumberFormat.getCurrencyInstance(new Locale("en", "IN")).format(price));
         priceMessage += "\n" + getString(R.string.thank_you);
         return priceMessage;
     }
